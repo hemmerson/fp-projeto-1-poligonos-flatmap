@@ -11,6 +11,7 @@ import javafx.stage.Stage;
 import java.util.List;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -131,8 +132,20 @@ public class PoligonosApp extends Application {
      * "triângulo", "pentágono", "hexágono" ou apenas um "polígono" geral quando tiver mais de 6 lados.
      */
     protected List<String> tipoPoligonos(){
-        // TODO Apague esta linha e a próxima e implemente seu código
-        return List.of();
+        return pontosPoligonos.stream()
+                .flatMap(poligono -> {
+                    int nPontos = poligono.size();
+                    String tipo = switch (nPontos) {
+                        case 1, 2 -> "Não é polígono";
+                        case 3 -> "Triângulo";
+                        case 4 -> "Quadrilátero";
+                        case 5 -> "Pentágono";
+                        case 6 -> "Hexágono";
+                        default -> "Polígono";
+                    };
+                    return Stream.of(tipo);
+                })
+                .collect(Collectors.toList());
     }
 
     /**
@@ -176,8 +189,22 @@ public class PoligonosApp extends Application {
      * @return uma lista contendo o perímetro de cada polígono
      */
     protected List<Double> perimetros(){
-        // TODO Apague esta linha e a próxima e implemente seu código
-        return List.of();
+        return pontosPoligonos.stream()
+                .flatMap(pontos -> {
+                    if (pontos.isEmpty() || pontos.size() == 1 || pontos.size() == 2) {
+                        return Stream.of(0.0);
+                    }
+
+                    final Point ultimoPonto = pontos.get(pontos.size() - 1);
+                    final Point resultado = pontos.stream()
+                            .reduce(
+                                    ultimoPonto,
+                                    Point::new
+                            );
+
+                    return Stream.of(resultado.distance());
+                })
+                .collect(Collectors.toList());
     }
 }
 
